@@ -1,0 +1,109 @@
+<html>
+
+<head>
+    <title>TicTacToe</title>
+</head>
+<style>
+    #board {
+        width: 310px;
+        height: 310px;
+    }
+    
+    .cell {
+        width: 100px;
+        height: 100px;
+        color: white;
+        background-color: green;
+        display: inline-block;
+        border: solid 1px white;
+        vertical-align: middle;
+        line-height: 100px;
+        font-size: 50px;
+        text-align: center;
+    }
+</style>
+
+<body>
+    <div id="board"></div>
+    <script>
+        // 匹配规则，2=>X, 1=>O, 0=>空白
+        let pattern = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ];
+
+        let cur = 2; // X先行
+        let count = 0; // 下子数
+
+        function show() {
+            let board = document.getElementById('board');
+            board.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    let cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.innerText = pattern[i][j] == 2 ? 'X' : (pattern[i][j] == 1 ? 'O' : '');
+                    cell.addEventListener('click', () => move(i, j));
+                    board.appendChild(cell);
+                }
+            }
+            if (check()) {
+                let player = cur == 2 ? 'X' : 'O';
+                setTimeout(() => {
+                    alert(player + ' win！');
+                }, 50);
+
+            } else if (count == 9) {
+                alert('和棋');
+            }
+        }
+
+        function move(i, j) {
+            if (pattern[i][j] != 0) return; // 已经走过的格子，不能再走
+            count++; // 下子数+1
+            pattern[i][j] = cur;
+            show();
+            cur = 3 - cur;
+        }
+
+        function check() {
+            // 三行
+            for (let i = 0; i < 3; i++) {
+                let win = true;
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[i][j] != cur) win = false;
+                }
+                if (win) return true;
+            }
+            // 三列
+            for (let j = 0; j < 3; j++) {
+                let win = true;
+                for (let i = 0; i < 3; i++) {
+                    if (pattern[i][j] != cur) win = false;
+                }
+                if (win) return true;
+            }
+            // 正斜线
+            {
+                let win = true;
+                for (let i = 0; i < 3; i++) {
+                    if (pattern[i][2 - i] != cur) win = false;
+                }
+                if (win) return true;
+            }
+            // 反斜线
+            {
+                let win = true;
+                for (let i = 0; i < 3; i++) {
+                    if (pattern[i][i] != cur) win = false;
+                }
+                if (win) return true;
+            }
+        }
+
+        show();
+    </script>
+</body>
+
+</html>
