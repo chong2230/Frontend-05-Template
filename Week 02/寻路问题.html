@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寻路问题</title>
+    <style>
+        #container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 701px;
+        }
+        
+        .cell {
+            display: block;
+            width: 6px;
+            height: 6px;
+            background-color: gray;
+            border-bottom: solid 1px white;
+            border-right: solid 1px white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <button onclick="save()">save</button>
+    <script>
+        // 1. 画地图
+        let data = localStorage['map'];
+        let map = data ? JSON.parse(data) : Array(10000).fill(0);
+        let container = document.getElementById('container');
+        for (let y = 0; y < 100; y++) {
+            for (let x = 0; x < 100; x++) {
+                let cell = document.createElement('div');
+                cell.classList.add('cell');
+                container.appendChild(cell);
+            }
+        }
+        // 2. 画墙
+        // 3. 设置起点和终点
+        // 4. 保存地图
+        function save() {
+            localStorage['map'] = JSON.stringify(map);
+        }
+
+        document.addEventListener("mouseup", () => mouosedown = false);
+        document.addEventListener("contextmenu", e => e.preventDefault());
+
+        function sleep(t) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, t)
+            })
+        }
+
+        // 异步编程实现可视化寻路算法
+        async function path(map, start, end) {
+            var queue = [start];
+
+            async function insert(x, y) {
+                if (x < 0 || x >= 100 || y < 0 || y >= 100)
+                    return;
+                if (map[y * 100 + x])
+                    return;
+
+                await sleep(30);
+                container.children[y * 100 + x].style.backgroundColor = "lightgreen";
+                map[y * 100 + x] = 2;
+                queue.push([x, y]);
+            }
+
+            while (queue.length) {
+                let [x, y] = queue.shift();
+                console.log(x, y);
+                if (x === end[0] && y === end[1]) {
+                    return true;
+                }
+                await insert(x - 1, y);
+                await insert(x, y - 1);
+                await insert(x + 1, y);
+                await insert(x, y + 1);
+            }
+            return false;
+        }
+    </script>
+</body>
+
+</html>
