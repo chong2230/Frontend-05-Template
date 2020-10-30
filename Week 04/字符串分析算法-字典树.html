@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let $ = Symbol("$");
+        // 字典树
+        class Trie {
+            constructor() {
+                // 使用Object或Map存储
+                this.root = Object.create(null);
+            }
+
+            // 插入字典中
+            insert(word) {
+                let node = this.root;
+                for (let c of word) {
+                    if (!node[c])
+                        node[c] = Object.create(null);
+                    node = node[c];
+                }
+                // 添加截止符
+                if (!($ in node))
+                    node[$] = 0;
+
+                node[$]++;
+            }
+
+            // 寻找出现最多的字符串及出现次数，遍历整个树
+            most() {
+                let max = 0;
+                let maxWord = null;
+                let visit = (node, word) => {
+                    if (node[$] && node[$] > max) {
+                        max = node[$];
+                        maxWord = word;
+                    }
+                    // TODO：理解这样写的作用
+                    for (let p in node) {
+                        visit(node[p], word + p);
+                    }
+                }
+                visit(this.root, "");
+                console.log(maxWord, max);
+            }
+        }
+
+        // 生成10万个字符
+        function randomWord(length) {
+            var s = "";
+            for (let i = 0; i < length; i++) {
+                s += String.fromCharCode(Math.random() * 26 + "a".charCodeAt(0));
+            }
+            return s;
+        }
+
+        let trie = new Trie();
+        for (let i = 0; i < 100000; i++) {
+            trie.insert(randomWord(4));
+        }
+        console.log(trie);
+        trie.most();
+
+        // 拓展: 字典树最大、字段树最小、补位处理
+    </script>
+</body>
+
+</html>

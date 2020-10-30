@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+                                                                         * 28. 实现 strStr()
+                                                                        实现 strStr() 函数。
+
+                                                                        给定一个 haystack 字符串和一个 needle 字符串，在 haystack 字符串中找出 needle 字符串出现的第一个位置 (从0开始)。如果不存在，则返回  -1。
+
+                                                                        示例 1:
+
+                                                                        输入: haystack = "hello", needle = "ll"
+                                                                        输出: 2
+                                                                        示例 2:
+
+                                                                        输入: haystack = "aaaaa", needle = "bba"
+                                                                        输出: -1
+                                                                        说明:
+
+                                                                        当 needle 是空字符串时，我们应当返回什么值呢？这是一个在面试中很好的问题。
+
+                                                                        对于本题而言，当 needle 是空字符串时我们应当返回 0 。这与C语言的 strstr() 以及 Java的 indexOf() 定义相符。
+                                                                         */
+
+        // 通过的题解一
+        /**
+         * @param {string} haystack
+         * @param {string} needle
+         * @return {number}
+         */
+        var strStr = function(haystack, needle) {
+            if (needle == '') return 0;
+            return haystack.indexOf(needle);
+        };
+
+        // 暴力匹配
+        function search(pat, txt) {
+            if (pat === '' || pat === txt) return 0;
+            var m = pat.length;
+            var n = txt.length;
+            for (var i = 0; i <= n - m; i++) {
+                var j;
+                for (j = 0; j < m; j++) {
+                    console.log(pat[j], txt[i + j]);
+                    if (pat[j] != txt[i + j])
+                        break;
+                }
+                // pat全都匹配了
+                if (j == m) return i;
+            }
+            // txt中不存在pat子串
+            return -1;
+        }
+
+        var strStr = function(haystack, needle) {
+            return search(needle, haystack);
+        };
+
+        // KMP算法
+        function kmp(source, pattern) {
+            if (pattern === '') return 0;
+            if (source === '') return -1;
+            // 计算table
+            let table = new Array(pattern.length).fill(0);
+
+            {
+                let i = 1,
+                    j = 0;
+                while (i < pattern.length) {
+                    if (pattern[i] === pattern[j]) {
+                        ++j, ++i;
+                        table[i] = j;
+                    } else {
+                        if (j > 0) {
+                            j = table[j];
+                        } else {
+                            ++i;
+                        }
+                    }
+                }
+            } {
+                let i = 0,
+                    j = 0;
+                while (i < source.length) {
+
+                    if (pattern[j] === source[i]) {
+                        ++i, ++j;
+                    } else {
+                        if (j > 0)
+                            j = table[j];
+                        else
+                            ++i;
+                    }
+                    // 匹配结束
+                    if (j === pattern.length)
+                        return i - j;
+                }
+                return -1;
+            }
+            console.log(table);
+
+            // abcdabce
+            // aabaaac
+        }
+        var strStr = function(haystack, needle) {
+            return kmp(haystack, needle);
+        };
+
+        console.log(kmp('abcdbcde', 'aabaaac'));
+        console.log(kmp('BBC ABCDAB ABCDABCDABDE', 'ABCDABD'));
+    </script>
+</body>
+
+</html>

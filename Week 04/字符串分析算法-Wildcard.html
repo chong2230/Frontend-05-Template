@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /*
+        wildcard: ab*c?d*abc*a?d
+        分情况考虑：
+        只有*
+        只有?
+        *号是尽量匹配的多还是少呢，最后一个*号前尽量少地匹配，最后一个*号尽量多地匹配
+        逐段地转换为正则，通过exec进行匹配
+        */
+
+        function find(source, pattern) {
+            // 要找最后一个*号
+            // 首先要找*号的数量
+            let starCount = 0;
+            for (let i = 0; i < pattern.length; i++) {
+                if (pattern[i] === '*')
+                    starCount++;
+            }
+            // 边沿case，没有*号的情况。字符串和pattern严格一一匹配。 ？匹配任何字符
+            if (starCount === 0) {
+                for (let i = 0; i < pattern.length; i++) {
+                    if (pattern[i] !== source[i] && pattern[i] !== '?')
+                        return false;
+                }
+                return;
+            }
+            // 第一个*号之前的部分
+            let i = 0; // 代表pattern的位置
+            let lastIndex = 0; // 代表原字符串source的位置
+
+            // *字符串*
+            for (i = 0; pattern[i] !== '*'; i++) {
+                if (pattern[i] !== source[i] && pattern[i] !== '?')
+                    return false;
+            }
+
+            lastIndex = i;
+
+            for (let p = 0; p < starCount - 1; p++) {
+                i++;
+                let subPattern = '';
+                while (pattern[i] !== '*') {
+                    subPattern += pattern[i];
+                    i++;
+                }
+
+                // ?替换为正则的语法
+                let reg = new RegExp(subPattern.replace(/\?/g, '[\\s\\S]'), 'g');
+                reg.lastIndex = lastIndex; // 很重要的属性，决定正则从哪里开始执行
+
+                // console.log(reg.exec(source));
+
+                if (!reg.exec(source))
+                    return false;
+
+                lastIndex = reg.lastIndex;
+            }
+
+            // 尾部匹配，最后一个*号后的字符串
+            for (let j = 0; j <= source.length - lastIndex && pattern[pattern.length - j] !== '*'; j++) {
+                if (pattern[pattern.length - j] !== source[source.length - j] &&
+                    pattern[pattern.length - j] !== '?')
+                    return false;
+
+            }
+            return true;
+        }
+
+        console.log(find('abcabcabxaac', 'a*b*bx*c'));
+        console.log(find('abcabcabxaac', 'a*b*b?x*c'));
+
+        // 思考题：带？的kmp算法来匹配
+    </script>
+</body>
+
+</html>
