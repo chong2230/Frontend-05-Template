@@ -1,0 +1,97 @@
+<div>
+    <input id="r" type="range" min=0 max=255 />
+    <input id="g" type="range" min=0 max=255 />
+    <input id="b" type="range" min=0 max=255 />
+    <div id="color" style="width: 100px; height: 100px"></div>
+</div>
+<script>
+    // Proxy是强大且危险的特性，为底层库设计，慎用
+    // 对象行为的可预测性会降低，你不知道Proxy里干了什么
+    // 完全代理的话，需要将Proxy的所有hook都进行代理，defineProperty etc
+
+    let callbacks = new Map(); // 全局的callback进行保存
+
+    let usedReactivities = [];
+    let reactivities = new Map(); // 缓存proxy
+
+    let obj = {
+        r: 1,
+        g: 1,
+        b: 1
+    };
+
+    let po = reactive(obj);
+
+    const isObject = val => val !== null && typeof val === 'object';
+
+    // reactive和effect之间建立连接
+
+    effect(() => {
+        document.getElementById('r').value = po.r;
+    })
+    effect(() => {
+        document.getElementById('g').value = po.g;
+    })
+    effect(() => {
+        document.getElementById('b').value = po.b;
+    })
+
+    document.getElementById('r').addEventListener('input', event => po.r = event.target.value);
+    document.getElementById('g').addEventListener('input', event => po.g = event.target.value);
+    document.getElementById('b').addEventListener('input', event => po.b = event.target.value);
+
+    effect(() => {
+        document.getElementById('color').style.backgroundColor = `rgb(${po.r},${po.g},${po.b}`;
+    })
+
+    function effect(callback) {
+        // callbacks.push(callback);
+        usedReactivities = [];
+        callback();
+        console.log(usedReactivities);
+
+        for (let reactivity of usedReactivities) {
+            // 可能多次注册，需写些防御性的代码
+            if (!callbacks.has(reactivity[0])) {
+                // 第一层放对象，第二层放属性
+                callbacks.set(reactivity[0], new Map());
+            }
+            if (!callbacks.get(reactivity[0]).has(reactivity[1])) {
+                callbacks.get(reactivity[0]).set(reactivity[1], []);
+            }
+            // 代码繁杂，不易理解
+            // 两级索引，存储callback
+            callbacks.get(reactivity[0]).get(reactivity[1]).push(callback);
+        }
+    }
+
+    // 课上示例
+    function reactive(obj) {
+        if (reactivities.has(obj)) {
+            return reactivities.get(obj);
+        }
+        let observed = new Proxy(obj, {
+            get(obj, prop) {
+                usedReactivities.push([obj, prop]);
+                return isObject(obj[prop]) ? reactive(obj[prop]) : obj[prop];
+            },
+            set(obj, prop, val) {
+                obj[prop] = val;
+                // 在set中遍历callbacks调用callback
+                // for (let callback of callbacks) {
+                //     callback();
+                // }
+                // 有对象，有属性
+                if (callbacks.get(obj))
+                    if (callbacks.get(obj).get(prop))
+                        for (let callback of callbacks.get(obj).get(prop)) {
+                            callback();
+                        }
+                return obj[prop];
+            }
+
+        });
+        reactivities.set(obj, observed);
+        return observed;
+    }
+</script>

@@ -1,0 +1,46 @@
+<script>
+    // Proxy是强大且危险的特性，为底层库设计，慎用
+    // 对象行为的可预测性会降低，你不知道Proxy里干了什么
+    // 完全代理的话，需要将Proxy的所有hook都进行代理，defineProperty etc
+    let obj = {
+        a: 2,
+        b: 3
+    };
+
+    let po = reactive(obj);
+
+    // 课上示例
+    function reactive(obj) {
+        let observed = new Proxy(obj, {
+            get(obj, prop) {
+                console.log(obj, prop);
+                return obj[prop];
+            },
+            set(obj, prop, val) {
+                console.log(obj, prop, val);
+                obj[prop] = val;
+                return obj[prop];
+            }
+
+        });
+        return observed;
+    }
+
+    // 使用Reflect
+    function reactive(obj) {
+        let observed = new Proxy(obj, {
+            get(obj, prop) {
+                console.log(obj, prop);
+                let res = Reflect.get(obj, prop);
+                return res;
+            },
+            set(obj, prop, val) {
+                console.log(obj, prop, val);
+                let res = Reflect.set(obj, prop, val);
+                return res;
+            }
+
+        });
+        return observed;
+    }
+</script>

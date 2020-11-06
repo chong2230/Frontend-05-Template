@@ -1,0 +1,26 @@
+<div>
+    <div id="dragable" style="width: 100px; height: 100px; background-color: pink"></div>
+</div>
+<script>
+    let dragable = document.getElementById('dragable');
+    let baseX = 0;
+    let baseY = 0;
+    // 拖拽的骨架代码
+    dragable.addEventListener('mousedown', (event) => {
+        let startX = event.clientX,
+            startY = event.clientY;
+        let up = (event) => {
+            baseX = baseX + event.clientX - startX;
+            baseY = baseY + event.clientY - startY;
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
+        };
+        let move = (event) => {
+            dragable.style.transform = `translate(${baseX + event.clientX - startX}px, ${baseY + event.clientY - startY}px)`;
+        };
+        // document监听mousemove事件，性能上、逻辑上都比在dragable上监听更好
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', up)
+
+    })
+</script>

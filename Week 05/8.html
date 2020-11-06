@@ -1,0 +1,68 @@
+<div>
+    <div id="container">
+        从今天开始，我们就从前端知识学习的部分，过渡到了实践部分。这节课我来谈谈性能。性能是个特别有意思的话题，在我之前的工作中，从入门的初级工程师到高级别的技术专家，大家都很喜欢谈性能，我以前参与晋升评审，每年总能听到很多关于性能的晋升述职。那么，今天我就来谈谈我眼中的性能。性能总论while 循环快还是 for 循环快？|0 是不是比 Math.floor 性能好？网上随处可以见到一类对性能的讨论。一些新人也非常热衷此类讨论。但是实际上，它们除了让你写代码的时候纠结之外，毫无意义。为什么这样讲呢？我想讲一个小故事。从前有个工程师，特别注重代码细节，有一天他发现系统中的一段代码写的性能很差，因此，他用汇编重写了整段代码，执行效率足足提升了三倍。但是最后，大家发现，用户反馈性能丝毫没有提高，因为他优化的那个进程名字叫“System
+        Idle”。所以你看，性能优化不能只着眼于局部的代码。这里，我要提出一个我的观点：一切没有 profiling 的性能都是耍流氓。凡是真正有价值的性能优化，必定是从端到端的业务场景建立体系来考虑的。在我的认识中，性能体系的建立可以分成以下几部分：现状评估和建立指标；技术方案；执行；结果评估和监控。下面，我就来为你一一讲解。现状评估和建立指标要想做好性能优化，正确地评估现状和建立指标是最关键的一步，它又往往是会被轻视的一步。作为一个工程师，指标又要考虑两个因素。一方面，对用户来说，什么样的性能指标能更好地评估它的体验？另一方面，对公司来说，什么样的指标会影响业务价值呢？在我公布答案之前，我希望你能思考一下，你所负责的业务，是否有前端性能指标？它是否能够满足我上面提到的两个要求？在我之前的工作中，整个用了长达一年的时间来探索，才找到了合适的指标，并且回答好了两个问题。性能问题可以分成很多方面，最重要的几个点是：页面加载性能；动画与操作性能；内存、电量消耗。注意，这里我们仅仅是对“性能”两个字的分析和解读，在对大量的用户数据分析后，我们发现，其实这三部分中，“页面加载性能”跟用户的流失率有非常强的关联性，而用户流失率，正是公司业务非常看重的指标。因此，在开始阶段，我们决定把性能优化的重点放在页面加载性能上。那么，用什么指标来衡量页面加载性能呢？最容易想到的方案是“用户平均加载时间”，事实上，我们在相当长的一段时间，也都是在使用用户平均加载时间作为性能指
+    </div>
+    <div id="dragable" style="display: inline-block; width: 100px; height: 100px; background-color: pink"></div>
+</div>
+<script>
+    let dragable = document.getElementById('dragable');
+    let baseX = 0;
+    let baseY = 0;
+    // 拖拽的骨架代码
+    dragable.addEventListener('mousedown', (event) => {
+        let startX = event.clientX,
+            startY = event.clientY;
+        let up = (event) => {
+            baseX = baseX + event.clientX - startX;
+            baseY = baseY + event.clientY - startY;
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
+        };
+        let move = (event) => {
+            let range = getNearest(event.clientX, event.clientY);
+            range.insertNode(dragable);
+            // dragable.style.transform = `translate(${baseX + event.clientX - startX}px, ${baseY + event.clientY - startY}px)`;
+        };
+        // document监听mousemove事件，性能上、逻辑上都比在dragable上监听更好
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', up)
+
+    })
+
+    let ranges = []; // 存放range
+
+    let container = document.getElementById('container');
+    for (let i = 0; i < container.childNodes[0].textContent.length; i++) {
+        // 找到所有的range位置，并进行创建
+        let range = document.createRange();
+        range.setStart(container.childNodes[0], i);
+        range.setEnd(container.childNodes[0], i);
+
+        //cssom api拿到位置
+        console.log(range.getBoundingClientRect(range));
+        ranges.push(range);
+    }
+
+    // 找离得最近的range
+    function getNearest(x, y) {
+        let min = Infinity;
+        let nearest = null;
+
+        for (let range of ranges) {
+            let rect = range.getBoundingClientRect(range);
+            // 取距离的平方进行比较
+            let distance = (rect.x - x) ** 2 + (rect.y - y) ** 2;
+            if (distance < min) {
+                nearest = range;
+                min = distance;
+            }
+        }
+        return nearest;
+    }
+
+    document.addEventListener('selectstart', event => event.preventDefault());
+
+    // 卡顿的比较厉害
+    // TODO: range的使用场景
+</script>
