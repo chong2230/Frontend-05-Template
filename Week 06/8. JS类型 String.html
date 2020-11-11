@@ -1,0 +1,140 @@
+<script>
+    /*
+                    String
+                        Character 字符
+                        Code Point 码点
+                        Encoding  编码方式
+
+                        a  97  01100001
+
+                        字符集
+                        ASCII 127个字符，26个大写字母、26个小写字母、数字0~9、制表符etc
+                        Unicode
+                        UCS
+                        GB，和Unicode不兼容
+                        GB2312，国标最早的一个版本
+                        GBK(GB13000)
+                        GB18030，大全的版本
+                        ISO-8859，和GB类似，不是一个统一的标准，没有中文的版本
+                        BIG5，大五码，台湾用的编码
+
+                        String-Encoding
+                        ASCII不存在编码问题，GB、Unicode存在编码的问题
+                        UTF8，一个字节表示一个字符
+                        UTF16，两个字节表示一个字符
+                        汉字'一'
+                        UTF8  11100100 10111000 10000000  , 掺入了控制字符
+                        UTF16 01001110 00000000
+
+                        练习写一个函数，把一个string它代表的字节给它转换出来
+                        
+                    */
+    function UTF8_Encoding(string) {
+        if (typeof string !== 'string') return;
+        let arr = [];
+        for (let i = 0; i < string.length; i++) {
+            arr.push(string[i].charCodeAt().toString(2));
+        }
+        return arr.join(' ');
+    }
+
+    console.log(UTF8_Encoding('123'));
+    console.log(UTF8_Encoding('abcde'));
+    console.log(UTF8_Encoding('你好，winter!'));
+
+    // 优秀作品1 写得这么复杂，看不懂呀
+    const UTF8_Encoding1 = (str) => {
+        const utf8Arr = [];
+        for (const c of str) {
+            // 查找每个字符的UTF-16的码点
+            const codePoint = c.codePointAt(0);
+            // 根据码点值所占字节分别处理
+            // 占用1个字节
+            if (codePoint >= 0x00 && codePoint <= 0x7f) {
+                utf8Arr.push(codePoint);
+            } else if (codePoint >= 0x80 && codePoint <= 0x7ff) {
+                utf8Arr.push(192 | (31 & (codePoint >> 6)));
+                utf8Arr.push(128 | (63 & codePoint));
+            } else if ((codePoint >= 0x800 && codePoint <= 0xd7ff) ||
+                (codePoint >= 0xe000 && codePoint <= 0xffff)
+            ) {
+                utf8Arr.push(224 | (15 & (codePoint >> 12)));
+                utf8Arr.push(128 | (63 & (codePoint >> 6)));
+                utf8Arr.push(128 | (63 & codePoint));
+            } else if (codePoint >= 0x10000 && codePoint <= 0x10ffff) {
+                utf8Arr.push(240 | (7 & (codePoint >> 18)));
+                utf8Arr.push(128 | (63 & (codePoint >> 12)));
+                utf8Arr.push(128 | (63 & (codePoint >> 6)));
+                utf8Arr.push(128 | (63 & codePoint));
+            }
+        }
+
+        // 转为二进制
+        const binaryArr = [];
+        for (const iterator of utf8Arr) {
+            binaryArr.push(iterator.toString(2));
+        }
+        return binaryArr;
+    }
+
+    console.log('优秀作品1：', UTF8_Encoding1('123'));
+    console.log('优秀作品1：', UTF8_Encoding1('abcde'));
+    console.log('优秀作品1：', UTF8_Encoding1('你好，winter!'));
+
+    function UTF8_Encoding2(string) {
+        // 仅考虑3字节的情况
+        let codeList = []
+        for (let i = 0; i < string.length; i++) {
+            let c = string.charCodeAt(i)
+            if (c <= 0x7F) {
+                codeList.push(c)
+            } else if (c <= 0x7FF) {
+                codeList.push((c >> 6) | 192) // 取前5位拼上110
+                codeList.push((c & 63) | 128) // 取后6位拼上10
+            } else if (c <= 0xFFFF) {
+                codeList.push((c >> 12) || 224) // 取前4位拼上1110
+                codeList.push(((c >> 6) & 63) | 128) // 取中间6位拼上10
+                codeList.push((c & 63) | 128) // 取后6位拼上10
+            }
+        }
+        return Buffer.from(codeList)
+    }
+
+    //另一种方案，利用encodeURI做转换
+    function UTF8_Encoding3(string) {
+        let code = encodeURI(string)
+        let codeList = []
+        let i = 0
+        while (i < code.length) {
+            if (code[i] === '%') {
+                codeList.push(parseInt(code[i + 1] + code[i + 2], 16))
+                i += 3
+            } else {
+                codeList.push(code[i].charCodeAt())
+                i++
+            }
+        }
+        return Buffer.from(codeList)
+    }
+
+    /*
+    String-Grammar
+    "abc"
+    'abc'
+    `abc`
+
+    回车 \n
+    Tab \t
+    反斜杠 \\
+    反引号厉害了，加什么都行
+
+    小练习：写一个正则表达式，匹配单引号和双引号的字符串的写法
+    ES5标准
+    ???
+    老师写的答案太长了，不贴了
+    \x
+    \u
+
+    String-Grammar-Template
+    */
+</script>

@@ -1,0 +1,44 @@
+<script>
+    /*
+                原型链
+
+                Symbol        Data
+                        =>
+                String        Accessor
+
+                没有办法构造两个一模一样的Symbol，实现访问的权限控制
+
+                Data Property   Accessor Property
+                [[value]]           get
+                writable            set
+                enumerable       enumerable
+                configurable     configurable
+
+                JavaScript用属性来统一抽象对象状态和行为
+                一般来说，数据属性用于描述状态，访问器属性则用于描述行为
+                数据属性中如果存储函数，也可以用于描述行为
+
+                每个对象只需要描述自己和原型的区别
+                {} [] Object.defineProperty
+                基于原型的对象api
+                Object.create / Object.setPrototypeOf / Object.getPrototypeOf
+                基于分类的方式
+                new / class / extends
+                历史遗留，建议不要用
+                new /function / prototype
+
+                Object（[[call]]）带call方法是内置行为
+                [[construct]]
+
+                Array [[length]]
+                Object.prototype [[setPrototypeOf]]
+                */
+
+    // 没有实际意义
+    //    foo() = 2;
+    //    delete x;
+
+    // [[]]双方括号定义的私有的方法
+    // 作业：找出JavaScript标准里面所有具有特殊行为的对象
+    // [[Construct]] [[Class]] [[Prototype]] [[Call]] [[Scopes]] [[FunctionLocation]] [[HomeObject]]
+</script>

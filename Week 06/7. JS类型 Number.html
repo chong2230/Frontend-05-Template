@@ -1,0 +1,55 @@
+<script>
+    /*
+        Atom
+
+        Grammar
+            Literal
+            Variable
+            Keywords
+            Whitespace
+            Line Terminator
+
+        Runtime
+            Types
+            Execution Context
+
+        Types
+        Number
+        String
+        Boolean: true/false
+        Object
+        Null: 有值，为空
+        Undefined: 没有定义过
+        Symbol：用于Object属性名的特殊的基本类型
+
+        赋值时都尽量用null，而不是undefined      
+        前五种最常用，Number、String、Boolean、Object、Null
+        typeof null = 'object'
+
+        Number
+        IEEE 754 Double Float
+          Sign(1)
+          Exponent(11)
+          Fraction(52)
+
+          Float表示浮点数，小数点是可以浮动的，把数字拆为指数和有效位数。
+          有一个最大的整数表示范围，还有一个符号表示正负
+          0.1 + 0.2 != 0.3, 就是因为三次转换+一次精度损失造成的
+
+          Number-Grammar
+          DecimalLiteral
+           0
+           0.
+           .2
+           1e3
+          BinaryIntegerLiteral
+            0b111
+          OctalIntegerLiteral
+            0o10
+          HexIntegerLiteral
+            0xFF
+
+           0.toString() 报错，0.是一个合法的数字，需要加空格0 .toString()
+           存在语法冲突
+    */
+</script>

@@ -1,0 +1,78 @@
+<script>
+    /*
+                                任何一个对象都是唯一的，这与它本身的状态无关。
+                                即使状态完全一致的两个对象，也并不相等
+                                我们用状态来描述对象
+                                我们状态的改变即是行为
+
+                                identifier
+                                state
+                                behavior
+
+                                忒修斯之船
+
+                                Object-Prototype
+
+                                小练习：：狗咬人
+                                “咬”这个行为该如何使用对象抽象？
+                                */
+
+    class Dog {
+        constructor(name) {
+            this.name = name;
+        }
+        bite(person) {
+            console.log(this.name + '咬' + person.name);
+        }
+    }
+    class Person {
+        constructor(name) {
+            this.name = name;
+        }
+    }
+    var dog = new Dog('二哈');
+    var person = new Person('小明');
+    dog.bite(person);
+
+    // 优秀作品
+    class Human {
+        constructor(name, HP = 100, MAX_HP = 100, MP = 9999) {
+            this.name = name
+            this.HP = HP
+            this.MP = MP
+            this.MAX_HP = MAX_HP
+            this.selfHealingSystem = setInterval(() => {
+                console.log(this.HP)
+                this.HP = Math.min(this.HP + 1, this.MAX_HP)
+            }, 1000)
+        }
+        hurt(f) {
+            this.HP = this.HP - f.damage
+            if (f.damage > 10)
+                console.log('花Q，', f.by.name, 'hurt me! Lost ', f.damage, 'HP')
+            if (this.HP <= 0)
+                clearInterval(this.selfHealingSystem)
+        }
+    }
+    class Dog1 {
+        constructor(name, HP = 100, MAX_HP = 100, MP = 1, WaZa, ATK = 5) {
+            this.name = name
+            this.HP = HP
+            this.MP = MP
+            this.MAX_HP = MAX_HP
+            this.WaZa = WaZa
+            this.ATK = ATK
+        }
+    }
+    const DogDogWaZa = {
+        '终极咬碎': 5.4,
+        '咬碎': 1.8,
+        '抓': 0.4
+    }
+    const dogA = new Dog1('野狗A', 100, 150, 5, DogDogWaZa);
+    const humanA = new Human('倒霉蛋小明')
+    humanA.hurt({
+        by: dogA,
+        damage: dogA.ATK + DogDogWaZa['终极咬碎']
+    })
+</script>

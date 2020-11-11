@@ -1,0 +1,26 @@
+<script>
+    /*
+            Boolean
+            true
+            false
+
+            Null & Undefined
+            null（关键字）
+            undefined（全局变量，可赋值）
+            void 0;
+            */
+    // 合法的
+    function f() {
+        var undefined = 1;
+        console.log(undefined);
+    }
+
+    // 报错
+    function f() {
+        //    var null = 1;
+        console.log(null);
+    }
+
+    // Object和Symbol是强相关
+    // undefined是全局变量，容易带来问题。建议使用void 0; 代替undefined
+</script>
