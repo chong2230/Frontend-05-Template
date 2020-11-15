@@ -1,23 +1,38 @@
 <script>
     /**
-     * 产生式（BNF，巴科斯-诺尔泛式）
-     * 用尖括号括起来的名称来表示语法结构名
-     * 语法结构分成基础结构和需要用其他语法结构定义的符合结构
-     *   基础结构称终结符
-     *   复合结构称非终结符
-     * （终结符不是指语句结束）
-     * 引号和中间的字符表示终结符
-     * 可以有括号
-     * *表示重复多次
-     * |表示或
-     * +表示至少出现一次
-     * eg：字母a的列表：a+
-     * 
-     * 四则运算：
-     * 1 + 2 * 3
-     * 
-     * 练习：编写带括号的四则运算产生式
-     * 
-     * 
-     **/
+         * 产生式（BNF，巴科斯-诺尔泛式）
+         * 用尖括号括起来的名称来表示语法结构名
+         * 语法结构分成基础结构和需要用其他语法结构定义的符合结构
+         *   基础结构称终结符
+         *   复合结构称非终结符
+         * （终结符不是指语句结束）
+         * 引号和中间的字符表示终结符
+         * 可以有括号
+         * *表示重复多次
+         * |表示或
+         * +表示至少出现一次
+         * eg：字母a的列表：a+
+         * 
+         * 四则运算：
+         * 1 + 2 * 3
+         * 
+         * 练习：编写带括号的四则运算产生式
+         * 自己写不出来，摘自优秀作品
+         * 
+         <MultiplicativeExpression>::=<Number>|
+            <MultiplicativeExpression>"*"<Number>|
+            <MultiplicativeExpression>"/"<Number>
+
+        <AdditiveExpression>::=<MultiplicativeExpression>|
+            <AdditiveExpression>"+"<MultiplicativeExpression>|
+            <AdditiveExpression>"-"<MultiplicativeExpression>
+
+        <PriorityExpression>::=<MultiplicativeExpression>|"("<AdditiveExpression>")"
+
+        <ArithmeticExpression>::=<PriorityExpression>"+"<PriorityExpression>|
+            <PriorityExpression>"-"<PriorityExpression>|
+            <PriorityExpression>"*"<PriorityExpression>|
+            <PriorityExpression>"/"<PriorityExpression>
+
+         **/
 </script>
