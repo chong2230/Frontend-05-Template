@@ -1,5 +1,11 @@
 # 学习笔记
 
+### 浏览器的工作原理
+
+    HTTP      parse  css computing      layout                 render
+
+URL  =>  HTML  =>  DOM  =>  DOM with CSS  =>  DOM with position  =>  Bitmap
+
 ### 有限状态机
 
 #### 每一个状态都是一个机器
@@ -37,41 +43,33 @@ Moore中state和input无关
 参考资料：字符串KMP算法
 https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
 
-function match(string) {
-    let state = start;
-    for(let c of string) {
-        state = state(c);
-    }
-    return state === end;
-}
-function start(c) {
-    if (c === "a") 
-        return foundA;
-}
-function foundA(c) {
-    if (c === "b") 
-        return foundA2;
-    else
-        return start(c);
-}
-function foundA2(c) {
-    if (c === "a") 
-        return foundB2;
-    else
-        return start(c);
-}
-function foundB2(c) {
-    if (c === "b") 
-        return foundA3;
-    else
-        return start(c);
-}
-function foundA3(c) {
-    if (c === "a") 
-        return foundA3;
-    else
-        return start(c);
-}
-function end(c) {
-    return end;
-}
+### HTTP协议解析
+
+ISO-OSI七层网络结构
+
+物理层 数据链路层 网络层 传输层 会话层 表示层 应用层
+
+4G/5G/Wifi  Internet TCP HTTP
+
+TCP与IP的基础知识 
+
+流  端口  require('net)
+
+包  IP地址  libnet/libpcap
+
+IP地址唯一地标识了连入网络的每个设备，libnet构造IP包并且发送，libpcap负责从网卡抓所有的流经你网卡的IP包
+
+HTTP
+
+Request/Response
+
+#### ResponseParser总结
+
+Resonse必须分段构造，所以我们要用一个ResponseParser来“装配”
+
+ResponseParser分段处理ResponseText，我们用状态机来分析文本的结构
+
+
+### 总结
+
+对浏览器工作原理有更深的了解，了解了如何使用状态机处理字符串，初步了解了如何实现HTTP请求和发送数据以及对Response进行解析
