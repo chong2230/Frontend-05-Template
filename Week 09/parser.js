@@ -292,6 +292,8 @@ function computeCSS(element) {
 }
 
 function emit(token) {
+    if (token.type === "text")
+        return;
     let top = stack[stack.length - 1]
 
     if (token.type == "startTag") {
@@ -312,6 +314,13 @@ function emit(token) {
         }
         computeCSS(element)
         top.children.push(element)
+    } else if (token.type == "endTag") {
+        if (top.tagName != token.tagName) {
+            throw new Error("Tag start end doesn't match!");
+        } else {
+            stack.pop();
+        }
+        currentTextNode = null;
     }
 }
 
