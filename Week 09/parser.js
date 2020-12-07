@@ -68,12 +68,114 @@ function tagName(c) {
 function beforeAttributeName(c) {
     if (c.match(/^[\t\n\f ]$/)) {
         return beforeAttributeName;
-    } else if (c == ">") {
-        return data;
+    } else if (c == "/" || c == ">" || c == EOF) {
+        return afterAttributeName(c);
     } else if (c == "=") {
-        return beforeAttributeName;
+        
     } else {
+        currentAttribute = {
+            name: "",
+            value: ""
+        }
+        return attributeName(c);
+    }
+}
+
+function attributeName(c) {
+    if (c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
+        return afterAttributeName(c);
+    } else if (c == "=") {
+        return beforeAttributeValue;
+    } else if (c == "\u0000") {
+        
+    } else if (c == "\"" || c == "'" || c == "<") {
+        
+    } else {
+        currentAttribute.name += c;
+        return attributeName;
+    }
+}
+
+function beforeAttributeValue(c) {
+    if (c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
+        return beforeAttributeValue;
+    } else if (c == "\"") {
+        return doubleQuoteAttributeValue;
+    } else if (c == "\'") {
+        return singleQuoteAttributeValue;
+    } else if (c == ">") {
+        
+    } else {        
+        return UnquoteAttributeValue(c);
+    }
+}
+
+function doubleQuoteAttributeValue(c) {
+    if (c == "\"") {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        return afterQuoteAttributeValue;
+    } else if (c == "\u0000") {
+        
+    } else if (c == EOF) {
+        
+    } else {
+        currentAttribute.value += c;
+        return doubleQuoteAttributeValue;
+    }
+}
+
+function singleQuoteAttributeValue(c) {
+    if (c == "\'") {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        return afterQuoteAttributeValue;
+    } else if (c == "\u0000") {
+        
+    } else if (c == EOF) {
+        
+    } else {
+        currentAttribute.value += c;
+        return doubleQuoteAttributeValue;   // ? 这里用doubleQuoteAttributeValue?
+    }
+}
+
+// 需再次听课进行理解
+function UnquoteAttributeValue(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
+        currentToken[currentAttribute.name] = currentAttribute.value;
         return beforeAttributeName;
+    } else if (c == "/") {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        return selfClosingStartTag;
+    } else if (c == ">'") {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken);
+        return data;
+    } else if (c == "\u0000") {
+        
+    } else if (c == "\"" || c == "'" || c == "=" || c == "`") {
+        
+    } else if (c == EOF) {
+        
+    } else {     
+        currentAttribute.value += c;   
+        return UnquoteAttributeValue;
+    }
+}
+
+function afterQuoteAttributeValue(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
+        return beforeAttributeName;
+    } else if (c == "/") {
+        return selfClosingStartTag;
+    } else if (c == ">") {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken);
+        return data;
+    } else if (c == EOF) {
+
+    } else {
+        currentAttribute.value += c;
+        return doubleQuoteAttributeValue;
     }
 }
 
