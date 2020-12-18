@@ -140,7 +140,13 @@ div.a
 
 ::first-letter
 
-思考：为什么first-letter可以设置display:block之类的，而first-line不行呢？
+思考：为什么first-letter可以设置float之类的，而first-line不行呢？
+
+伪元素是根据现有布局生成的东西，必须首先根据应用于DOM树中元素的CSS构造和渲染布局，仅靠文档语言（即标记）是无法实现的。
+
+::first-letter仅适用于块容器框，可设置display:block，如果设置display: inline;成为内联框，则first-letter将不起作用。
+
+::first-line在格式化之前，不知道元素文本的第一格式化行多长时间，且该行的内容和长度也可能随着调整大小而改变和/或重排元素及其内容。因此不能设置float之类样式
 
 作业：编写一个match函数，接收两个参数，第一个参数是一个选择器字符串性质，第二个是一个HTML元素，判断当前的元素是否能够匹配到我们的选择器
 

@@ -16,14 +16,15 @@ body.ready #wrapper > .lol233
 */
 
 function match(selector, element) {
-    let arr = selector.split(' ');
-    let parentArr = [];
+    let arr = selector.split(' ');  // 获取element的层级
+    let parentArr = [];             // 用于保存父节点
     let reg = /(\w+)|(\.\w+)|(\#\w+)/g;
     for (let i=0; i<arr.length; i++) {
         parentArr.push(arr[i].match(reg));
     }
 
     let matched = true;
+    // 从当前节点开始向上循环
     for (let j=parentArr.length-1; j>=0; j--) {
         if (!currentElementMatch(parentArr[j], element)) {
             matched = false;
@@ -59,7 +60,7 @@ function currentElementMatch(currSelector, currElement) {
             }
         }        
     }
-    return ((hasId && idMatch) || !hasId) && ((hasClass && classMatch) || !hasMatch) && ((hasTag && tagMatch) || !hasTag);
+    return ((hasId && idMatch) || !hasId) && ((hasClass && classMatch) || !hasClass) && ((hasTag && tagMatch) || !hasTag);
 }
 
 // match("div #id.class", document.getElementById("id"));
