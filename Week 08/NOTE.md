@@ -63,6 +63,20 @@ HTTP
 
 Request/Response
 
+### 发送请求
+
+设计支持已有的connection和自己新建connection
+
+收到数据传给parser
+
+根据parser的状态resolve Promise
+
+### response解析
+
+Response必须分段构造，所以我们要用一个ResponseParser来”装配“
+
+ResponseParser分段处理ResponseText，我们用状态机来分析文本的解构
+
 #### ResponseParser总结
 
 Resonse必须分段构造，所以我们要用一个ResponseParser来“装配”

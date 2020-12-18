@@ -1,10 +1,11 @@
 const net = require("net");
+const parser = require("./parser.js");
 
 class Request {
     constructor(options) {
         this.method = options.method || "GET";
         this.host = options.host;
-        this.port = options.oprt || 80;
+        this.port = options.port || 80;
         this.path = options.path || "/";
         this.body = options.body || {};
         this.headers = options.headers || {};
@@ -45,19 +46,20 @@ class Request {
                     connection.end();
                 })
             }
-            resolve("");
         })
     }
 
     toString() {
         return `${this.method} ${this.path} HTTP/1.1\r
 ${Object.keys(this.headers).map(key=>`${key}: ${this.headers[key]}`).join('\r\n')}\r
+\r
 ${this.bodyText}`
     }
 }
 
 class ResponseParser {
     constructor() {
+        // TODO: 常量的写法改成函数的写法
         this.WAITING_STATUS_LINE = 0;
         this.WAITING_STATUS_LINE_END = 1;
         this.WAITING_HEADER_NAME = 2;
@@ -108,6 +110,7 @@ class ResponseParser {
             } else if (char === '\r') {
                 this.current = this.WAITING_HEADER_BLOCK_END;
                 // 多个if else的结构
+                // console.log('Transfer-Encoding ', this.headers['Transfer-Encoding'])
                 if (this.headers['Transfer-Encoding'] === 'chunked')
                     this.bodyParser = new TrunkedBodyParser();
             } else {
@@ -135,8 +138,8 @@ class ResponseParser {
                 this.current = this.WAITING_BODY;
             }
         } else if (this.current === this.WAITING_BODY) {
-            console.log(char)
-            this.bodyParser.receiveChar(char);
+            // console.log(char)
+            this.bodyParser && this.bodyParser.receiveChar(char);
         }
     }
 }
@@ -146,7 +149,8 @@ class TrunkedBodyParser {
         this.WAITING_LENGTH = 0;
         this.WAITING_LENGTH_LINE_END = 1;
         this.READING_TRUNK = 2;
-        this.WAITING_NEW_LINE = 4;        
+        this.WAITING_NEW_LINE = 3;       
+        this.WAITING_NEW_LINE_END = 4;        
         this.length = 0;
         this.content = [];
         this.isFinished = false;
@@ -203,7 +207,7 @@ void async function () {
 
     console.log(response);
 
-    let dom = parser.parseHTML(response.body);
+    // let dom = parser.parseHTML(response.body);
 
 
 }();

@@ -95,3 +95,7 @@ specificity是个四元组，越左边权重越高
 # 总结
 
 对HTML的解析有了更深的认识，实际操作中还存在较大的理解障碍。
+
+### 备注
+
+server1和client1未调通，bad request
