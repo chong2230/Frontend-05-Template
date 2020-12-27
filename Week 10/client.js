@@ -1,12 +1,10 @@
 const net = require("net");
-const { render } = require("vue");
 const images = require("images");
 const parser = require("./parser.js");
 const render = require("./render.js");
 
 class Request {
     constructor(options) {
-        console.log(options)
         this.method = options.method || "GET";
         this.host = options.host;
         this.port = options.port || 80;
@@ -28,18 +26,16 @@ class Request {
         return new Promise((resolve, reject)=>{
             const parser = new ResponseParser();
             if (connection) {
-                console.log(this.toString());
                 connection.write(this.toString());
             } else {
                 connection = net.createConnection({
                     host: this.host,
                     port: this.port
                 }, ()=>{
-                    console.log(this.toString());
                     connection.write(this.toString());
                 });
                 connection.on("data", (data)=>{
-                    console.log('data ', data.toString());
+                    console.log(data.toString());
                     parser.receive(data.toString());
                     if (parser.isFinished) {
                         resolve(parser.response);
@@ -52,19 +48,20 @@ class Request {
                     connection.end();
                 })
             }
-            resolve("");
         })
     }
 
     toString() {
         return `${this.method} ${this.path} HTTP/1.1\r
 ${Object.keys(this.headers).map(key=>`${key}: ${this.headers[key]}`).join('\r\n')}\r
+\r
 ${this.bodyText}`
     }
 }
 
 class ResponseParser {
     constructor() {
+        // TODO: 常量的写法改成函数的写法
         this.WAITING_STATUS_LINE = 0;
         this.WAITING_STATUS_LINE_END = 1;
         this.WAITING_HEADER_NAME = 2;
@@ -114,8 +111,8 @@ class ResponseParser {
                 this.current = this.WAITING_HEADER_SPACE;
             } else if (char === '\r') {
                 this.current = this.WAITING_HEADER_BLOCK_END;
-                console.log('Transfer-Encoding', this.headers['Transfer-Encoding']);
                 // 多个if else的结构
+                // console.log('Transfer-Encoding ', this.headers['Transfer-Encoding'])
                 if (this.headers['Transfer-Encoding'] === 'chunked')
                     this.bodyParser = new TrunkedBodyParser();
             } else {
@@ -143,7 +140,7 @@ class ResponseParser {
                 this.current = this.WAITING_BODY;
             }
         } else if (this.current === this.WAITING_BODY) {
-            console.log(char)
+            // console.log(char)
             this.bodyParser && this.bodyParser.receiveChar(char);
         }
     }
@@ -155,7 +152,7 @@ class TrunkedBodyParser {
         this.WAITING_LENGTH_LINE_END = 1;
         this.READING_TRUNK = 2;
         this.WAITING_NEW_LINE = 3;       
-        this.WAITING_NEW_LINE_END = 4;            
+        this.WAITING_NEW_LINE_END = 4;        
         this.length = 0;
         this.content = [];
         this.isFinished = false;
@@ -210,7 +207,7 @@ void async function () {
 
     let response = await request.send();
 
-    console.log('response ', response);
+    console.log(response);
 
     // 实际上需要进行异步分段处理
     let dom = parser.parseHTML(response.body);
@@ -219,7 +216,10 @@ void async function () {
 
     let viewport = images(800, 600);
     
-    render(viewport, dom.children[0].children[3].children[1].children[3]);
+    // render(viewport, dom.children[0].children[3].children[1].children[3]);  // 存在问题，flex:1 未生效
+    render(viewport, dom.children[0].children[3].children[1].children[1]);      // height: 0
+
+    // render(viewport, dom);
 
     viewport.save("viewport.jpg");
 

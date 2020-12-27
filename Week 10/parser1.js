@@ -1,7 +1,5 @@
 let currentToken = null;
 
-const css = require('css');
-
 const EOF = Symbol["EOF"];  // EOF: End of file
 
 const layout = require('./layout.js');
@@ -33,11 +31,7 @@ function tagOpen(c) {
         }
         return tagName(c);
     } else {
-        emit({
-            type: "text",
-            content: c
-        });
-        return ;
+
     }
 }
 
@@ -62,14 +56,13 @@ function tagName(c) {
         return beforeAttributeName;
     } else if (c == "/") {
         return selfClosingStartTag;
-    } else if (c.match(/^[A-Z]$/)) {
+    } else if (c.match(/^[a-zA-Z]$/)) {
         currentToken.tagName += c;
         return tagName;
     } else if (c == ">") {
         emit(currentToken);
         return data;
     } else {
-        currentToken.tagName += c;
         return tagName;
     }
 }
@@ -86,29 +79,6 @@ function beforeAttributeName(c) {
             name: "",
             value: ""
         }
-        return attributeName(c);
-    }
-}
-
-function afterAttributeName(c) {
-    if (c.match(/^[\t\n\f ]$/)) {
-        return afterAttributeName;
-    } else if (c == "/") {
-        return selfClosingStartTag;
-    } else if (c == "=") {
-        return beforeAttributeValue;
-    } else if (c == ">") {
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        emit(currentToken);
-        return data;
-    } else if (c == EOF) {
-
-    } else {
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        currentAttribute = {
-            name: "",
-            value: ""
-        };
         return attributeName(c);
     }
 }
@@ -214,7 +184,6 @@ function afterQuoteAttributeValue(c) {
 function selfClosingStartTag(c) {
     if (c == ">") {
         currentToken.isSelfClosing = true;
-        emit(currentToken);
         return data;
     } else if (c == "EOF") {
 
@@ -282,8 +251,8 @@ function compare(sp1, sp2) {
 }
 
 function computeCSS(element) {
-    // console.log(rules)
-    // console.log("compute CSS for Element", element)
+    console.log(rules)
+    console.log("compute CSS for Element", element)
     // 标签匹配从当前元素逐级往外匹配，所以需要reverse
     var elements = stack.slice().reverse();
     if (!element.computedStyle) 
@@ -302,10 +271,10 @@ function computeCSS(element) {
             matched = true
 
         if(matched) {
-            // console.log("Element", element, element.computedStyle)
+            console.log("Element", element, element.computedStyle)
             var sp = specificity(rule.selectors[0])
             var computedStyle = element.computedStyle;
-            for (var declaration of rule.declarations) {
+            for (var declaration of rule.declaration) {
                 if (!computedStyle[declaration.property]) {
                     computedStyle[declaration.property] = {}
                 }
@@ -325,9 +294,8 @@ function computeCSS(element) {
 }
 
 function emit(token) {
-    // !!! 注意，下面这句需要删除 ！！！
-    // if (token.type === "text")
-    //     return;
+    if (token.type === "text")
+        return;
     let top = stack[stack.length - 1]
 
     if (token.type == "startTag") {
@@ -347,11 +315,11 @@ function emit(token) {
             }
         }
         computeCSS(element)
-        top.children.push(element)
+        top.children.push(element);
 
-        if (!token.isSelfClosing)
+        if (!token.isSelfClosing) {
             stack.push(element);
-
+        }
         currentTextNode = null;
         
     } else if (token.type == "endTag") {
@@ -359,32 +327,21 @@ function emit(token) {
             throw new Error("Tag start end doesn't match!");
         } else {
             if (top.tagName === "style") {
-                console.log('top: ', top);
-                if (top.children.length > 0)
-                    addCSSRules(top.children[0].content);
+                addCSSRules(top.children[0].content);
             }
+            layout(top);
             stack.pop();
         }
-        layout(top);
         currentTextNode = null;
-    } else if (token.type == "text") {
-        if (currentTextNode == null) {
-            currentTextNode = {
-                type: "text",
-                content: ""
-            }
-            top.children.push(currentTextNode);
-        }
-        currentTextNode.content += token.content;
     }
 }
 
 module.exports.parseHTML = function parseHTML(html) {
-    // console.log(html);
-    let state = data;
-    for (let c of html) {
-        state = state(c);
-    }
-    state = state(EOF);
-    return stack[0];
+    console.log(html);
+    // let state = data;
+    // for (let c of html) {
+    //     state = state(c);
+    // }
+    // state = state(EOF);
+    // return stack[0];
 }

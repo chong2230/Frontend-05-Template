@@ -125,7 +125,7 @@ function layout(element) {
 
     // 分行
     var flexLine = []
-    var felxLines = [flexLine]
+    var flexLines = [flexLine]
 
     var mainSpace = elementStyle[mainSize];
     var crossSpace = 0;
@@ -151,7 +151,7 @@ function layout(element) {
                 flexLine.mainSpace = mainSpace;
                 flexLine.crossSpace = crossSpace;
                 flexLine = [item];
-                felxLines.push(flexLine);
+                flexLines.push(flexLine);
                 mainSpace = style(mainSize);
                 crossSpace = 0;
             } else {
@@ -193,7 +193,7 @@ function layout(element) {
         }
     } else {
         // process each flex line
-        felxLines.forEach(function (items) {
+        flexLines.forEach(function (items) {
             var mainSpace = items.mainSpace;
             var flexTotal = 0;
             for (var i=0; i<items.length; i++) {
@@ -259,12 +259,12 @@ function layout(element) {
     if (!style[crossSize]) {    // auto sizing
         crossSpace = 0;
         elementStyle[crossSize] = 0;
-        for (var i=0; i<felxLines.length; i++) {
+        for (var i=0; i<flexLines.length; i++) {
             elementStyle[crossSize] = elementStyle[crossSize] + flexLines[i].crossSpace;
         }
     } else {
         crossSpace = style[crossSize]
-        for (var i=0; i<felxLines.length; i++) {
+        for (var i=0; i<flexLines.length; i++) {
             crossSpace -= flexLines[i].crossSpace;
         }
     }

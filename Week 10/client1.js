@@ -1,8 +1,11 @@
 const net = require("net");
+const images = require("images");
 const parser = require("./parser.js");
+const render = require("./render.js");
 
 class Request {
     constructor(options) {
+        console.log(options)
         this.method = options.method || "GET";
         this.host = options.host;
         this.port = options.port || 80;
@@ -24,16 +27,18 @@ class Request {
         return new Promise((resolve, reject)=>{
             const parser = new ResponseParser();
             if (connection) {
+                console.log(this.toString());
                 connection.write(this.toString());
             } else {
                 connection = net.createConnection({
                     host: this.host,
                     port: this.port
                 }, ()=>{
+                    console.log(this.toString());
                     connection.write(this.toString());
                 });
                 connection.on("data", (data)=>{
-                    console.log(data.toString());
+                    console.log('data ', data.toString());
                     parser.receive(data.toString());
                     if (parser.isFinished) {
                         resolve(parser.response);
@@ -46,6 +51,7 @@ class Request {
                     connection.end();
                 })
             }
+            resolve("");
         })
     }
 
@@ -107,8 +113,8 @@ class ResponseParser {
                 this.current = this.WAITING_HEADER_SPACE;
             } else if (char === '\r') {
                 this.current = this.WAITING_HEADER_BLOCK_END;
+                console.log('Transfer-Encoding', this.headers['Transfer-Encoding']);
                 // 多个if else的结构
-                console.log('Transfer-Encoding ', this.headers['Transfer-Encoding']);
                 if (this.headers['Transfer-Encoding'] === 'chunked')
                     this.bodyParser = new TrunkedBodyParser();
             } else {
@@ -148,7 +154,7 @@ class TrunkedBodyParser {
         this.WAITING_LENGTH_LINE_END = 1;
         this.READING_TRUNK = 2;
         this.WAITING_NEW_LINE = 3;       
-        this.WAITING_NEW_LINE_END = 4;           
+        this.WAITING_NEW_LINE_END = 4;            
         this.length = 0;
         this.content = [];
         this.isFinished = false;
@@ -203,12 +209,18 @@ void async function () {
 
     let response = await request.send();
 
-    console.log(response);
+    console.log('response ', response);
 
     // 实际上需要进行异步分段处理
     let dom = parser.parseHTML(response.body);
 
-    console.log(dom);
+    console.log('parser ', JSON.stringify(dom, null, "    "));
+
+    let viewport = images(800, 600);
+    
+    render(viewport, dom.children[0].children[3].children[1].children[3]);
+
+    viewport.save("viewport.jpg");
 
 
 }();

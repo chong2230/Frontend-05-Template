@@ -207,7 +207,10 @@ void async function () {
 
     console.log(response);
 
-    // let dom = parser.parseHTML(response.body);
+    // 实际上需要进行异步分段处理
+    let dom = parser.parseHTML(response.body);
+
+    console.log(dom);
 
 
 }();

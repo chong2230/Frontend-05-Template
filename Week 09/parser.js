@@ -29,7 +29,11 @@ function tagOpen(c) {
         }
         return tagName(c);
     } else {
-
+        emit({
+            type: "text",
+            content: c
+        });
+        return ;
     }
 }
 
@@ -54,13 +58,14 @@ function tagName(c) {
         return beforeAttributeName;
     } else if (c == "/") {
         return selfClosingStartTag;
-    } else if (c.match(/^[a-zA-Z]$/)) {
+    } else if (c.match(/^[A-Z]$/)) {
         currentToken.tagName += c;
         return tagName;
     } else if (c == ">") {
         emit(currentToken);
         return data;
     } else {
+        currentToken.tagName += c;
         return tagName;
     }
 }
@@ -77,6 +82,29 @@ function beforeAttributeName(c) {
             name: "",
             value: ""
         }
+        return attributeName(c);
+    }
+}
+
+function afterAttributeName(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
+        return afterAttributeName;
+    } else if (c == "/") {
+        return selfClosingStartTag;
+    } else if (c == "=") {
+        return beforeAttributeValue;
+    } else if (c == ">") {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken);
+        return data;
+    } else if (c == EOF) {
+
+    } else {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        currentAttribute = {
+            name: "",
+            value: ""
+        };
         return attributeName(c);
     }
 }
@@ -182,6 +210,7 @@ function afterQuoteAttributeValue(c) {
 function selfClosingStartTag(c) {
     if (c == ">") {
         currentToken.isSelfClosing = true;
+        emit(currentToken);
         return data;
     } else if (c == "EOF") {
 
@@ -314,6 +343,12 @@ function emit(token) {
         }
         computeCSS(element)
         top.children.push(element)
+
+        if (!token.isSelfClosing)
+            stack.push(element);
+
+        currentTextNode = null;
+        
     } else if (token.type == "endTag") {
         if (top.tagName != token.tagName) {
             throw new Error("Tag start end doesn't match!");
@@ -321,15 +356,24 @@ function emit(token) {
             stack.pop();
         }
         currentTextNode = null;
+    } else if (token.type == "text") {
+        if (currentTextNode == null) {
+            currentTextNode = {
+                type: "text",
+                content: ""
+            }
+            top.children.push(currentTextNode);
+        }
+        currentTextNode.content += token.content;
     }
 }
 
 module.exports.parseHTML = function parseHTML(html) {
-    console.log(html);
-    // let state = data;
-    // for (let c of html) {
-    //     state = state(c);
-    // }
-    // state = state(EOF);
-    // return stack[0];
+    // console.log(html);
+    let state = data;
+    for (let c of html) {
+        state = state(c);
+    }
+    state = state(EOF);
+    return stack[0];
 }
