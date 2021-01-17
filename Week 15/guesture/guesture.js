@@ -3,13 +3,15 @@ let element = document.documentElement;
 let isListeningMouse = false;
 
 element.addEventListener("mousedown", event => {
-    let context = Object.create(null);
-    contexts.set("mouose" + (1 << event.button), context);
+    let context = Object.create(null);  // kv的匹配，避免Object的原始属性的干扰
+    contexts.set("mouse" + (1 << event.button), context);
+    
     start(event, context);
+    
     let mousemove = event => {
         // console.log(event.clientX, event.clientY);
         let button = 1;
-        while(button <= event.buttons) {
+        while(button <= event.buttons) {    // 掩码的古典设计
             if (button & event.buttons) {
                 // order of buttons & button property is not same
                 let key;
@@ -27,9 +29,8 @@ element.addEventListener("mousedown", event => {
         // move(event);
     }
     let mouseup = event => {
-        end(event);
         let context = contexts.get("mouse" + (1 << event.button));
-        end(event. context);
+        end(event, context);
         contexts.delete("mouse" + (1 << event.button));
 
         if (event.buttons === 0) {
@@ -51,26 +52,35 @@ let contexts = new Map();
 
 element.addEventListener("touchstart", event => {
     for (let touch of event.changedTouches) {
-        console.log(touch.clientX, touch.clientY);
-        start(touch);
+        // console.log(touch.clientX, touch.clientY);
+        let context = Object.create(null);
+        contexts.set(touch.identifier, context);
+        start(touch, context);
     }
 })
 element.addEventListener("touchmove", event => {
     for (let touch of event.changedTouches) {
-        console.log(touch.clientX, touch.clientY);
-        move(touch);
+        // console.log(touch.clientX, touch.clientY);
+        let context = contexts.get(touch.identifier);
+        console.log("touchmove", context);
+        move(touch, context);
     }
 });
 element.addEventListener("touchend", event => {
     for (let touch in event.changedTouches) {
-        console.log(touch.clientX, touch.clientY);
-        end(touch);
+        // console.log(touch.clientX, touch.clientY);
+        let context = contexts.get(touch.identifier);
+        console.log("touchend", context);
+        end(touch, context);
+        contexts.delete(touch.identifier);
     }
 });
 element.addEventListener("touchcancel", event => {
     for (let touch of event.changedTouches) {
-        console.log(touch.clientX, touch.clientY);
-        cancel(touch);
+        // console.log(touch.clientX, touch.clientY);
+        let context = contexts.get(touch.identifier);
+        cancel(touch, context);
+        contexts.delete(touch.identifier);
     }
 });
 
@@ -124,6 +134,7 @@ let move = (point, context) => {
     })
 }
 let end = (point, context) => {
+    console.log("end", context);
     if(context.isTap) {
         // console.log("tap");
         dispatch("tap", {});
@@ -140,11 +151,10 @@ let end = (point, context) => {
     if (!context.points.length) {
         v = 0;
     } else {
-
+        d = Math.sqrt((point.clientX - contexts.points[0].x) ** 2 +
+        (point.clientY - context.points[0].y) ** 2);
+        v = d / (Date.now() - context.points[0].t);
     }
-    let d = Math.sqrt((point.clientX - contexts.points[0].x) ** 2 +
-        (point.clientY - contexts.points[0].y) ** 2);
-    let v = d / (Date.now() - contexts.points[0].t);
 
     if (v > 1.5) {
         console.log("flick");
