@@ -175,7 +175,6 @@ let cancel = (point, context) => {
 
 function dispatch(type, properties) {
     let event = new Event(type);
-    console.log(event);
     for (let name in properties) {
         event[name] = properties[name]
     }
