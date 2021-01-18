@@ -2,7 +2,7 @@ let element = document.documentElement;
 
 let isListeningMouse = false;
 
-element.addEventListener("mousedown", event => {
+element.addEventListener("mousedown", event => {    
     let context = Object.create(null);  // kv的匹配，避免Object的原始属性的干扰
     contexts.set("mouse" + (1 << event.button), context);
     
@@ -28,21 +28,24 @@ element.addEventListener("mousedown", event => {
         }
         // move(event);
     }
+    
     let mouseup = event => {
         let context = contexts.get("mouse" + (1 << event.button));
+        console.log('mouseup end', context);
         end(event, context);
         contexts.delete("mouse" + (1 << event.button));
 
         if (event.buttons === 0) {
-            element.removeEventListener("mousemove", mousemove);
-            element.removeEventListener("mouseup", mouseup);
+            document.removeEventListener("mousemove", mousemove);
+            document.removeEventListener("mouseup", mouseup);
             isListeningMouse = false;
         }
        
     }
+    // mouseup调用次数过多
     if (!isListeningMouse) {
-        element.addEventListener("mousemove", mousemove);
-        element.addEventListener("mouseup", mouseup);
+        document.addEventListener("mousemove", mousemove);
+        document.addEventListener("mouseup", mouseup);
         isListeningMouse = true;
     }
     
@@ -62,15 +65,13 @@ element.addEventListener("touchmove", event => {
     for (let touch of event.changedTouches) {
         // console.log(touch.clientX, touch.clientY);
         let context = contexts.get(touch.identifier);
-        console.log("touchmove", context);
         move(touch, context);
     }
 });
 element.addEventListener("touchend", event => {
-    for (let touch in event.changedTouches) {
+    for (let touch of event.changedTouches) {
         // console.log(touch.clientX, touch.clientY);
         let context = contexts.get(touch.identifier);
-        console.log("touchend", context);
         end(touch, context);
         contexts.delete(touch.identifier);
     }
@@ -99,9 +100,9 @@ let start = (point, context) => {
         y: point.clientY
     }];
 
-    context.isTap = true;
-    context.isPan = false;
-    context.isPress = false;
+    context.isTap = true;       // tap 点击
+    context.isPan = false;      // pan 随着手指移动
+    context.isPress = false;   // 按下
 
     context.handler = setTimeout(()=>{
         // console.log("press");
@@ -114,8 +115,11 @@ let start = (point, context) => {
 let move = (point, context) => {
     let dx = point.clientX - context.startX, dy = point.clientY - context.startY;
 
+    // 移动10px
     if (!context.isPan && dx ** 2 + dy ** 2 > 100) {
+        context.isTap = false;
         context.isPan = true;
+        context.isPress = false;
         console.log("panstart");
         clearTimeout(context.handler);
     }
@@ -146,12 +150,12 @@ let end = (point, context) => {
     if(context.isPress) {
         console.log("pressend");
     }
-    context.points = context.points.filter(point => Date.now() - pint.t < 500);
+    context.points = context.points.filter(point => Date.now() - point.t < 500);
     let d, v;
     if (!context.points.length) {
         v = 0;
     } else {
-        d = Math.sqrt((point.clientX - contexts.points[0].x) ** 2 +
+        d = Math.sqrt((point.clientX - context.points[0].x) ** 2 +
         (point.clientY - context.points[0].y) ** 2);
         v = d / (Date.now() - context.points[0].t);
     }
@@ -172,7 +176,7 @@ let cancel = (point, context) => {
 function dispatch(type, properties) {
     let event = new Event(type);
     console.log(event);
-    for (let name of properties) {
+    for (let name in properties) {
         event[name] = properties[name]
     }
     element.dispatchEvent(event);
