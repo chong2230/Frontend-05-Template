@@ -35,3 +35,18 @@ var a = <div id="a">
     </div>;
 
 document.body.appendChild(a);
+
+/*
+var a = createElement(
+    'div',
+    { id: 'a' },
+    'Hello World',
+    createElement('span', null),
+    createElement('span', null),
+    createElement(
+        'span',
+        null,
+        '3'
+    )
+);
+*/

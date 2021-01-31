@@ -34,11 +34,9 @@ module.exports = class extends Generator {
         };
         this.fs.extendJSON(this.destinationPath('package.json'), pkgJson);
         this.npmInstall(["vue"], { 'save-dev': false });
-        this.npmInstall(["webpack@3", "vue-loader", "vue-style-loader", "url-loader",
+        this.npmInstall(["webpack@3", "vue-loader", "vue-style-loader", "url-loader", "copy-webpack-plugin",
             "css-loader" ,"mini-css-extract-plugin", "vue-template-compiler"], { 'save-dev': true });
-    } 
-    
-    copyFiles() {
+
         this.fs.copyTpl(
             this.templatePath('HelloWorld.vue'),
             this.destinationPath('src/HelloWorld.vue'),
@@ -49,8 +47,14 @@ module.exports = class extends Generator {
             this.destinationPath('webpack.config.js')
         );
         this.fs.copyTpl(
-            this.templatePath('HelloWorld.vue'),
+            this.templatePath('main.js'),
             this.destinationPath('src/main.js')
         );
-    }
+        this.fs.copyTpl(
+            this.templatePath('index.html'),
+            this.destinationPath('src/index.html'),
+            { title: answers.name }
+        );    
+    } 
+    
 }

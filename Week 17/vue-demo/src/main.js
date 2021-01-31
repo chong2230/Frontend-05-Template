@@ -1,23 +1,19 @@
-<template>
-    <div id="example">
-        <p>Original message: "{{ message }}"</p>
-        <p>Computed reversed message: "{{ reversedMessage }}"</p>
-    </div>
-</template>
-<script>
-export default {
-    name: 'Hello World',
-    data() {
-        return {
-            message: 'Hello'
-        }
-    },
-    computed: {
-        // 计算属性的 getter
-        reversedMessage: function () {
-        // `this` 指向 vm 实例
-        return this.message.split('').reverse().join('')
-        }
-    }
+// import HelloWorld from 'HelloWorld.vue';
+// import Vue from 'vue';
+
+// new Vue({
+//     el: "#app",
+//     render: h => h(HelloWorld)
+// })
+
+for (let a of [1,2,3]) {
+    console.log(a);
 }
-</script>
+
+/*
+new Vue({
+    el: "#app",
+    template: "<HelloWorld/>",
+    components: {HelloWorld}
+})
+*/
