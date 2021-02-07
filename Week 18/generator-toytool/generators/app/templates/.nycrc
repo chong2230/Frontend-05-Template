@@ -1,0 +1,13 @@
+{
+    "extends": "@istanbuljs/nyc-config-babel",
+    "all": true,
+    "require": [
+        "@babel/register"
+    ],
+    "reporter": [
+        "lcov",
+        "text"
+    ],
+    "sourceMap": false,
+    "instrument": false
+}

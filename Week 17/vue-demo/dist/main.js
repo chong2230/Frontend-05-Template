@@ -77,7 +77,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/dist/";
+/******/ 	__webpack_require__.p = "";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
@@ -90,10 +90,11 @@
 /*!*********************!*\
   !*** ./src/main.js ***!
   \*********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-eval("throw new Error(\"Module parse failed: Unexpected token (1:0)\\nYou may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders\\n> <template>\\n|     <div id=\\\"example\\\">\\n|         <p>Original message: \\\"{{ message }}\\\"</p>\");//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvbWFpbi5qcy5qcyIsInNvdXJjZXMiOltdLCJtYXBwaW5ncyI6IiIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///./src/main.js\n");
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n!(function webpackMissingModule() { var e = new Error(\"Cannot find module 'HelloWorld.vue'\"); e.code = 'MODULE_NOT_FOUND'; throw e; }());\n\n// import Vue from 'vue';\n\n// new Vue({\n//     el: \"#app\",\n//     render: h => h(HelloWorld)\n// })\n\nfor (let a of [1,2,3]) {\n    console.log(a);\n}\n\n/*\nnew Vue({\n    el: \"#app\",\n    template: \"<HelloWorld/>\",\n    components: {HelloWorld}\n})\n*/\n\n//# sourceURL=webpack:///./src/main.js?");
 
 /***/ })
 

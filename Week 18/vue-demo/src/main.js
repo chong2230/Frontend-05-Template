@@ -1,4 +1,4 @@
-import HelloWorld from 'HelloWorld.vue';
+import HelloWorld from './HelloWorld.vue';
 import Vue from 'vue';
 
 new Vue({

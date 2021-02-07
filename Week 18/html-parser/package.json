@@ -1,0 +1,24 @@
+{
+    "name": "html-parser",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "nyc": "nyc --use-spawn-wrap mocha",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "devDependencies": {
+        "chai": "^4.2.0",
+        "mocha": "^7.1.1",
+        "nyc": "^15.0.1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "css": "^3.0.0"
+    }
+}

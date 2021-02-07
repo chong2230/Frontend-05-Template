@@ -1,0 +1,13 @@
+{
+  "name": "test-ts",
+  "version": "1.0.0",
+  "scripts": {
+    "nyc:correct": "nyc --use-spawn-wrap mocha",
+    "nyc:wrong": "nyc mocha"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.1.1",
+    "nyc": "^15.0.1"
+  }
+}
